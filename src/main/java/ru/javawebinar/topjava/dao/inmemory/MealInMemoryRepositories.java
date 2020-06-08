@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.dao.mockinmemory;
+package ru.javawebinar.topjava.dao.inmemory;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealDao;
