@@ -3,9 +3,9 @@
 <%@ taglib prefix="f" uri="http://topjava.javawebinar.ru/functions" %>
 <html>
 <head>
-    <title>Update Meal</title>
-</head
-<h1>Update Meal</h1>
+    <title>TOPJava</title>
+</head>
+<h1>Form update meal</h1>
 <h3><a href="meals">Back</a></h3>
 <hr>
 <body>

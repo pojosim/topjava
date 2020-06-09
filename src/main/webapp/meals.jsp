@@ -3,7 +3,7 @@
 <%@ taglib prefix="f" uri="http://topjava.javawebinar.ru/functions" %>
 <html>
 <head>
-    <title>List Meals</title>
+    <title>TOPJava</title>
     <link href="css/style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -18,7 +18,7 @@
     <th></th>
     <c:forEach items="${meals}" var="meal">
         <tr class="${meal.excess ? 'red' : 'green'}">
-            <td><c:out value="${f:formatLocalDateTime(meal.dateTime, 'yyyy-MM-dd HH:mm')}"/></td>
+            <td><c:out value="${f:formatLocalDateTime(meal.dateTime)}"/></td>
             <td><c:out value="${meal.description}"/></td>
             <td><c:out value="${meal.calories}"/></td>
             <td><a href="meals?action=update&id=${meal.id}">Update</a></td>

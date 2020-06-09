@@ -14,9 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class MealInMemoryRepositories implements MealDao {
-
-    private static final Logger log = getLogger(MealInMemoryRepositories.class);
+public class MealInMemoryRepository implements MealDao {
     private AtomicLong counter = new AtomicLong(0);
     private Map<Long, Meal> mealsMemoryDB = new ConcurrentHashMap<>();
 
@@ -31,12 +29,12 @@ public class MealInMemoryRepositories implements MealDao {
     }
 
     @Override
-    public List<Meal> getAllMeals() {
+    public List<Meal> getAll() {
         return new ArrayList<>(mealsMemoryDB.values());
     }
 
     @Override
-    public Meal getMealById(long mealId) {
+    public Meal getById(long mealId) {
         return mealsMemoryDB.get(mealId);
     }
 
@@ -52,7 +50,7 @@ public class MealInMemoryRepositories implements MealDao {
     }
 
     @Override
-    public void deleteMealById(long mealId) {
+    public void deleteById(long mealId) {
         mealsMemoryDB.remove(mealId);
     }
 }

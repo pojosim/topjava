@@ -1,8 +1,8 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
+import ru.javawebinar.topjava.dao.inmemory.MealInMemoryRepository;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
@@ -11,66 +11,70 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private final MealService mealService = new MealService();
+    private MealInMemoryRepository mealRepository;
 
-    private static String LIST_MEALS = "listmeals.jsp";
-    private static String INSERT_OR_EDIT = "meal.jsp";
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        mealRepository = new MealInMemoryRepository();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.debug("Redirect to meals page");
-
-        String forward = "";
         String action = req.getParameter("action");
-        Long id;
+        long id;
 
-        switch (action == null ? "null" : action) {
+        switch (action != null ? action : "null") {
             case "delete":
-                forward = LIST_MEALS;
-                id = Long.valueOf(req.getParameter("id"));
-                mealService.deleteMealById(id);
-                req.setAttribute("meals", MealsUtil.filteredByStreamsWithoutDate(mealService.getAllMeals(),
-                        MealsUtil.DEFAULT_CALORIES));
+                id = Long.parseLong(req.getParameter("id"));
+                mealRepository.deleteById(id);
+                log.debug("Delete meal, id={}",id);
+                resp.sendRedirect("meals");
                 break;
             case "update":
-                forward = INSERT_OR_EDIT;
-                id = Long.valueOf(req.getParameter("id"));
-                Meal meal = mealService.getMealById(id);
+                id = Long.parseLong(req.getParameter("id"));
+                Meal meal = mealRepository.getById(id);
+                log.debug("Redirect to form update meal, id={}",id);
                 req.setAttribute("meal", meal);
+                req.getRequestDispatcher("/meal-edit.jsp").forward(req, resp);
                 break;
             case "create":
-            case "null":
             default:
-                forward = LIST_MEALS;
-                req.setAttribute("meals", MealsUtil.filteredByStreamsWithoutDate(mealService.getAllMeals(),
-                        MealsUtil.DEFAULT_CALORIES));
+                req.setAttribute("meals", MealsUtil.filteredByStreams(mealRepository.getAll(), LocalTime.MIN,
+                        LocalTime.MAX, MealsUtil.DEFAULT_CALORIES));
+                req.getRequestDispatcher("/meals.jsp").forward(req, resp);
+                break;
         }
-
-        req.getRequestDispatcher(forward).forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        log.debug("POST request processing");
         req.setCharacterEncoding("UTF-8");
         String action = req.getParameter("action");
-        Meal meal;
 
-        if (action != null && action.equalsIgnoreCase("update")) {
-            meal = new Meal(Long.parseLong(req.getParameter("id")), LocalDateTime.parse(req.getParameter("dateTime")),
-                    req.getParameter("description"), Integer.parseInt(req.getParameter("calories")));
-            mealService.save(meal);
-        } else if (action != null && action.equalsIgnoreCase("create")) {
-            meal = new Meal(LocalDateTime.parse(req.getParameter("dateTime")),
-                    req.getParameter("description"), Integer.parseInt(req.getParameter("calories")));
-            mealService.save(meal);
+        switch (action != null ? action : "null") {
+            case "create":
+            case "update":
+                Long id = req.getParameter("id") != null ? Long.parseLong(req.getParameter("id")) : null;
+                Meal meal = new Meal(id, LocalDateTime.parse(req.getParameter("dateTime")),
+                        req.getParameter("description"), Integer.parseInt(req.getParameter("calories")));
+                mealRepository.save(meal);
+
+                if (id == null) {
+                    log.debug("Create meal, dateTime={}; description={}; calories={}", meal.getDateTime(), meal.getDescription(), meal.getCalories());
+                } else {
+                    log.debug("Update meal, id={}; dateTime={}; description={}; calories={}", id, meal.getDateTime(), meal.getDescription(), meal.getCalories());
+                }
+                break;
         }
-
         resp.sendRedirect("meals");
     }
 }
