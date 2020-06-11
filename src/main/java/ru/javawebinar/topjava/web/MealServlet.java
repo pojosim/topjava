@@ -27,7 +27,7 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        log.debug("Redirect to meals page");
+        log.debug("GET request processing");
         String action = req.getParameter("action");
         long id;
 
@@ -37,6 +37,7 @@ public class MealServlet extends HttpServlet {
                 mealRepository.deleteById(id);
                 log.debug("Delete meal, id={}",id);
                 resp.sendRedirect("meals");
+                log.debug("Redirect to meals page");
                 break;
             case "update":
                 id = Long.parseLong(req.getParameter("id"));
