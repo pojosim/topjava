@@ -6,7 +6,6 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,39 +23,45 @@ public class InMemoryMealRepository implements MealRepository {
     private AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.MEALS.forEach(this::save);
+        MealsUtil.MEALS.forEach(meal -> this.save(meal, meal.getUserId()));
     }
 
     @Override
-    public Meal save(Meal meal) {
-        log.info("save {}", meal);
+    public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
+            meal.setUserId(userId);
             repository.put(meal.getId(), meal);
+            log.info("Save {}", meal);
             return meal;
         }
-        // handle case: update, but not present in storage
-        return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+
+        Meal updatedMeal = repository.computeIfPresent(meal.getId(), (id, oldMeal) -> {
+            meal.setUserId(userId);
+            return userId == oldMeal.getUserId() ? meal : oldMeal;
+        });
+        log.info("Update {}", meal);
+        return updatedMeal != null &&
+                updatedMeal.getId() == meal.getId() &&
+                updatedMeal.getUserId() == meal.getUserId() ? meal : null;
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        log.info("delete {}", id);
+        log.info("Delete id={}", id);
         return (get(id, userId) != null) && repository.remove(id) != null;
-
-
     }
 
     @Override
     public Meal get(int id, int userId) {
-        log.info("get {}", id);
+        log.info("Get id={}", id);
         Meal meal = repository.get(id);
-        return (meal == null && meal.getUserId() != userId) ? null : meal;
+        return (meal != null && meal.getUserId() == userId) ? meal : null;
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        log.info("getAll");
+        log.info("GetAll");
         return repository.values().stream()
                 .filter(meal -> meal.getUserId() == userId)
                 .sorted(Comparator.comparing(Meal::getDateTime))
