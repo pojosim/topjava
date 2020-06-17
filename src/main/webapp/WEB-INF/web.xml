@@ -25,14 +25,4 @@
         <servlet-name>mealServlet</servlet-name>
         <url-pattern>/meals</url-pattern>
     </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>mainServlet</servlet-name>
-        <servlet-class>ru.javawebinar.topjava.web.MainServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>mainServlet</servlet-name>
-        <url-pattern>/selectuserid</url-pattern>
-    </servlet-mapping>
-
 </web-app>

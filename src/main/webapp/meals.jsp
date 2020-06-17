@@ -15,6 +15,13 @@
             color: red;
         }
     </style>
+    <script>function clearFilterForm() {
+        document.getElementById('startDate').value = ''
+        document.getElementById('endDate').value = ''
+        document.getElementById('startTime').value = ''
+        document.getElementById('endTime').value = ''
+    }
+    </script>
 </head>
 <body>
 <section>
@@ -22,6 +29,19 @@
     <hr/>
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
+    <br><br>
+    <form method="post" action="meals?action=filter">
+        <div>
+            От даты (включая)<input type="date" id="startDate" value="${startDate}" name="startDate" autocomplete="off"/>
+            От времени (включая)<input type="time" id="startTime" value="${startTime}" name="startTime" autocomplete="off"/>
+        </div>
+        <div>
+            До даты (включая)<input type="date" id="endDate" value="${endDate}" name="endDate" autocomplete="off"/>
+            До времени (включая)<input type="time" id="endTime" value="${endTime}" name="endTime" autocomplete="off"/>
+        </div>
+        <input type="button" value="Отчистить" onclick="clearFilterForm()">
+        <input type="submit" value="Отфильтровать">
+    </form>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
