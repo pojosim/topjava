@@ -20,12 +20,11 @@ public class MealService {
     }
 
     public Meal create(Meal meal, int userId) {
-        ValidationUtil.checkNew(meal);
         return repository.save(meal, userId);
     }
 
     public void update(Meal meal, int userId) {
-        checkNotFound(repository.save(meal, userId), "meal=" + meal + ", userId=" + userId);
+        checkNotFound(repository.save(meal, userId), "meal=" + meal);
     }
 
     public void delete(int id, int userId) {

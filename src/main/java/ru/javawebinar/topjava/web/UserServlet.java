@@ -27,6 +27,6 @@ public class UserServlet extends HttpServlet {
             log.info("Select user, id={}",userId);
             SecurityUtil.setAuthUserId(Integer.parseInt(userId));
         }
-        response.sendRedirect("/topjava");
+        response.sendRedirect("index.html");
     }
 }

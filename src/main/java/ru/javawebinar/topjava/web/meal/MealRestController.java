@@ -6,13 +6,13 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.util.ValidationUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
@@ -48,12 +48,13 @@ public class MealRestController {
 
     public Meal create(Meal meal) {
         log.info("Create {}", meal);
-        checkNew(meal);
+        ValidationUtil.checkNew(meal);
         return service.create(meal, authUserId());
     }
 
-    public void update(Meal meal) {
+    public void update(Meal meal, int id) {
         log.info("Update {}", meal);
+        ValidationUtil.assureIdConsistent(meal, id);
         service.update(meal, authUserId());
     }
 

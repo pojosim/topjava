@@ -39,7 +39,7 @@
             До даты (включая)<input type="date" id="endDate" value="${endDate}" name="endDate" autocomplete="off"/>
             До времени (включая)<input type="time" id="endTime" value="${endTime}" name="endTime" autocomplete="off"/>
         </div>
-        <input type="button" value="Отчистить" onclick="clearFilterForm()">
+        <input type="button" value="Отменить" onclick="return location.href = 'meals'">
         <input type="submit" value="Отфильтровать">
     </form>
     <br><br>
