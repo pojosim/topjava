@@ -27,17 +27,11 @@ import static ru.javawebinar.topjava.UserTestData.*;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class UserServiceTest {
-
-    @Autowired
-    private UserService service;
-
     @Rule
     public BenchmarkWatcher benchmarkWatcher = new BenchmarkWatcher();
 
-    @AfterClass
-    public static void showResultBenchmark() {
-        BenchmarkWatcher.showResult();
-    }
+    @Autowired
+    private UserService service;
 
     @Test
     public void create() throws Exception {
@@ -94,5 +88,10 @@ public class UserServiceTest {
     public void getAll() throws Exception {
         List<User> all = service.getAll();
         USER_MATCHER.assertMatch(all, ADMIN, USER);
+    }
+
+    @AfterClass
+    public static void showResultBenchmark() {
+        BenchmarkWatcher.showResult();
     }
 }
