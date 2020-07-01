@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,11 +29,18 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
-    @Rule
-    public BenchmarkWatcher benchmarkWatcher = new BenchmarkWatcher();
-
     @Autowired
     private MealService service;
+
+    @ClassRule
+    public static final BenchmarkWatcher benchmarkWatcher = new BenchmarkWatcher();
+    @Rule
+    public BenchmarkWatcher benchmarkWatcherR = benchmarkWatcher;
+
+    @AfterClass
+    public static void showResultTests() {
+        benchmarkWatcher.showResult();
+    }
 
     @Test
     public void delete() throws Exception {
@@ -104,10 +112,5 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() throws Exception {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), MEALS);
-    }
-
-    @AfterClass
-    public static void showResultBenchmark() {
-        BenchmarkWatcher.showResult();
     }
 }

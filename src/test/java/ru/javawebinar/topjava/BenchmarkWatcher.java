@@ -1,43 +1,45 @@
 package ru.javawebinar.topjava;
 
-import org.junit.AssumptionViolatedException;
-import org.junit.rules.Stopwatch;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BenchmarkWatcher extends Stopwatch {
+public class BenchmarkWatcher extends TestWatcher {
     private static final Logger log = getLogger(BenchmarkWatcher.class);
-    public static final StringBuilder RESULT_BUILDER = new StringBuilder();
 
-    public static void showResult() {
-        log.info(RESULT_BUILDER.toString());
+    public final StringBuilder resultBuilder;
+
+    public BenchmarkWatcher() {
+        resultBuilder = new StringBuilder();
+        resultBuilder.append("\r\n")
+                .append(String.format("%-28s %s", "test", "time"));
     }
 
     @Override
-    protected void succeeded(long nanos, Description description) {
-        logInfo(description, "succeeded", nanos);
+    public Statement apply(Statement base, Description description) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                long start = now();
+                base.evaluate();
+                long spent = TimeUnit.NANOSECONDS.toMillis(now() - start);
+                log.info(String.format("Test [%s] spent %d ms", description.getMethodName(), spent));
+                resultBuilder.append("\r\n").append(String.format("%-28s %d ms", description.getMethodName(), spent));
+            }
+        };
     }
 
-    @Override
-    protected void failed(long nanos, Throwable e, Description description) {
-        logInfo(description, "failed", nanos);
+    private long now() {
+        return System.nanoTime();
     }
 
-    @Override
-    protected void skipped(long nanos, AssumptionViolatedException e, Description description) {
-        logInfo(description, "skipped", nanos);
-    }
-
-    private void logInfo(Description description, String status, long nanos) {
-        String result = String.format("Test {%s} %s, spent %d ms", description.getMethodName(),
-                status, TimeUnit.NANOSECONDS.toMillis(nanos));
-        log.info(result);
-        RESULT_BUILDER.append("\r\n").append(result);
+    public void showResult() {
+        log.info(resultBuilder.toString());
     }
 
 }
