@@ -23,8 +23,14 @@
     <logger name="ru.javawebinar.topjava" level="debug"/>
     <logger name="org.springframework.web.servlet" level="debug"/>
 
+    <logger name="org.springframework.transaction" level="TRACE">
+        <appender-ref ref="spring-t" />
+    </logger>
+
     <root level="info">
         <appender-ref ref="file"/>
         <appender-ref ref="console"/>
     </root>
+
+    <logger name="org.springframework.jdbc.core.StatementCreatorUtils" level="TRACE" />
 </configuration>
