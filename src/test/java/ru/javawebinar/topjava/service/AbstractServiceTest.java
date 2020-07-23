@@ -6,6 +6,7 @@ import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,8 +51,7 @@ abstract public class AbstractServiceTest {
         });
     }
 
-    protected boolean isJdbc() {
-//        return Arrays.stream(environment.getActiveProfiles()).anyMatch(s -> s.equals(Profiles.JPA) || s.equals(Profiles.DATAJPA));
-        return Arrays.stream(environment.getActiveProfiles()).anyMatch(s -> s.equals(Profiles.JDBC));
+    protected boolean isJpa() {
+        return environment.acceptsProfiles(org.springframework.core.env.Profiles.of(Profiles.DATAJPA, Profiles.JPA));
     };
 }
