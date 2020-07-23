@@ -8,14 +8,14 @@
 </head>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
-<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="url" value="${pageContext.request.contextPath}"/>
 
 <section>
     <spring:message code="mealform.title.${action == 'create' ? 'create' : 'edit'}" var="title"/>
 
     <h2>${title}</h2>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <form method="post" action="${contextPath}/meals/save">
+    <form method="post" action="${url}/meals/save">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt><spring:message code="meal.table.title.date"/>:</dt>

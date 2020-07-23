@@ -79,10 +79,6 @@ public class JspMealController extends AbstractMealController {
 
     @PostMapping("/save")
     public String processSave(HttpServletRequest request) throws UnsupportedEncodingException {
-//        if (errors.hasErrors()) {
-//            return "mealForm";
-//        }
-
         //request.setCharacterEncoding("UTF-8");
         Meal meal = new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
@@ -96,8 +92,6 @@ public class JspMealController extends AbstractMealController {
             meal.setId(getId(request));
             service.update(meal, authUserId());
         }
-        log.info("process update {} for user {}", meal, authUserId());
-        service.update(meal, authUserId());
         return "redirect:/meals";
     }
 

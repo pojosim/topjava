@@ -19,10 +19,8 @@ import ru.javawebinar.topjava.repository.UserRepository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional(readOnly = true)
@@ -38,7 +36,6 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
-    private BatchPreparedStatementSetter pss;
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -61,7 +58,6 @@ public class JdbcUserRepository implements UserRepository {
             user.setId(newKey.intValue());
             jdbcTemplate.batchUpdate(SQL_INSERT_USER_ROLES, batchPreparedStatementSetter);
             return user;
-
         } else if (namedParameterJdbcTemplate.update(
                 "UPDATE users SET name=:name, email=:email, password=:password, " +
                         "registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id", parameterSource) != 0
@@ -70,7 +66,6 @@ public class JdbcUserRepository implements UserRepository {
             jdbcTemplate.batchUpdate(SQL_INSERT_USER_ROLES, batchPreparedStatementSetter);
             return user;
         }
-
         return null;
     }
 
@@ -101,50 +96,51 @@ public class JdbcUserRepository implements UserRepository {
     private static class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
         @Override
         public List<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
-            List<User> users = new ArrayList<>();
+            Map<Integer, User> users = new HashMap<>();
             while (rs.next()) {
-                User rsUser = new User();
-                rsUser.setId(rs.getInt("id"));
-                Optional<User> findOptionalUser = users.stream().filter(user -> user.getId().equals(rsUser.getId())).findFirst();
-                if (findOptionalUser.isPresent()) {
+                User rsUser = users.get(rs.getInt("id"));
+                if (rsUser != null) {
                     Role newRole = Enum.valueOf(Role.class, rs.getString("role"));
-                    findOptionalUser.get().getRoles().add(newRole);
+                    rsUser.getRoles().add(newRole);
                 } else {
+                    rsUser = new User();
+                    rsUser.setId(rs.getInt("id"));
                     rsUser.setName(rs.getString("name"));
                     rsUser.setEmail(rs.getString("email"));
                     rsUser.setPassword(rs.getString("password"));
                     rsUser.setCaloriesPerDay(rs.getInt("calories_per_day"));
                     rsUser.setEnabled(rs.getBoolean("enabled"));
                     rsUser.setRegistered(rs.getDate("registered"));
-                    rsUser.setRoles(new HashSet<>() {{
-                        add(Enum.valueOf(Role.class, rs.getString("role")));
-                    }});
-                    users.add(rsUser);
+                    if (rs.getString("role") != null) {
+                        rsUser.setRoles(new HashSet<>() {{
+                            add(Enum.valueOf(Role.class, rs.getString("role")));
+                        }});
+                    }
+                    users.put(rsUser.getId(), rsUser);
                 }
             }
-            return users;
+            return new ArrayList<>(users.values());
         }
     }
 
     private class UserRolesBatchPreparedStatementSetter implements BatchPreparedStatementSetter {
         private final User user;
+        private final List<Role> roles;
 
         public UserRolesBatchPreparedStatementSetter(User user) {
             this.user = user;
+            this.roles = new ArrayList<>(user.getRoles());
         }
 
         @Override
         public void setValues(PreparedStatement ps, int i) throws SQLException {
-//                    List<Role> roles = new ArrayList<>(user.getRoles());
-//                    Role role = roles.get(i);
-            Role role = user.getRoles().stream().skip(i).findFirst().get();
             ps.setInt(1, user.getId());
-            ps.setString(2, role.toString());
+            ps.setString(2, roles.get(i).toString());
         }
 
         @Override
         public int getBatchSize() {
-            return user.getRoles().size();
+            return roles.size();
         }
     }
 }

@@ -50,7 +50,8 @@ abstract public class AbstractServiceTest {
         });
     }
 
-    protected boolean isJpaOrDatajpa() {
-        return Arrays.stream(environment.getActiveProfiles()).anyMatch(s -> s.equals(Profiles.JPA) || s.equals(Profiles.DATAJPA));
+    protected boolean isJdbc() {
+//        return Arrays.stream(environment.getActiveProfiles()).anyMatch(s -> s.equals(Profiles.JPA) || s.equals(Profiles.DATAJPA));
+        return Arrays.stream(environment.getActiveProfiles()).anyMatch(s -> s.equals(Profiles.JDBC));
     };
 }
