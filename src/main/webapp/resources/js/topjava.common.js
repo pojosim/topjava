@@ -5,7 +5,7 @@ function makeEditable(ctx) {
     form = $('#detailsForm');
     $(".delete").click(function () {
         if (confirm('Are you sure?')) {
-            deleteRow($(this).attr("id"));
+            deleteRow($(this).closest("tr").attr("id"));
         }
     });
 
@@ -38,6 +38,10 @@ function updateTable() {
     });
 }
 
+function updateTableByData(data) {
+        context.datatableApi.clear().rows.add(data).draw();
+}
+
 function save() {
     $.ajax({
         type: "POST",
@@ -45,7 +49,7 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        updateTable();
+        updateFilteredTable();
         successNoty("Saved");
     });
 }

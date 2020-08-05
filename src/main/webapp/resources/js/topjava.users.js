@@ -1,7 +1,9 @@
+var userAjaxUrl = "admin/users/";
+
 // $(document).ready(function () {
 $(function () {
     makeEditable({
-            ajaxUrl: "admin/users/",
+            ajaxUrl: userAjaxUrl,
             datatableApi: $("#datatable").DataTable({
                 "paging": false,
                 "info": true,
@@ -39,4 +41,23 @@ $(function () {
             })
         }
     );
+
+    $('input:checked').each(function () {
+        $(this).closest("tr").attr('data-userEnabled', true);
+    })
+
+    $('input').on('click', function () {
+        //     var id = $(this).closest("tr").attr("id");
+        //     var enabled = chkbox.is(":checked");
+        //     $.ajax({
+        //         url: userAjaxUrl + id,
+        //         type: "POST",
+        //         data: ??
+        // }
+        if ($(this).is(':checked')) {
+            $(this).closest("tr").attr('data-userEnabled', true);
+        } else {
+            $(this).closest("tr").attr('data-userEnabled', false);
+        }
+    })
 });

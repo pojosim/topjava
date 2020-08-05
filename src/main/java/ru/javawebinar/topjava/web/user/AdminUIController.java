@@ -25,6 +25,13 @@ public class AdminUIController extends AbstractUserController {
         super.delete(id);
     }
 
+    @Override
+    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void update(@RequestBody User user, @PathVariable int id) {
+        super.update(user, id);
+    }
+
     @PostMapping
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void createOrUpdate(@RequestParam Integer id,
